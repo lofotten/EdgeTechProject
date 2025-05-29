@@ -13,22 +13,30 @@ public:
     }
 
     /// @brief processes a sample and returns a filtered sample
-    /// @param inputNoisySample noisy sample to be filtered by algorithm
+    /// @param inputArray noisy sample to be filtered by algorithm
+    /// @param sampleValue defines the length of the vector
     /// @return returns a filtered sample
-    float run(float inputNoisySample)
+    std::vector<float> run(const float *inputArray, size_t sampleValue)
     {
-        buffer.push(inputNoisySample);        // Get a new sample and add to buffer
-        movingAverageSum += inputNoisySample; // adding the sample to the sum
+        std::vector<float> filteredDataList;
 
-        if (buffer.size() > windowSize)
+        for (size_t i = 0; i < sampleValue; i++)
         {
-            movingAverageSum -= buffer.front(); // Subtract the oldest sample and protects future avg.
-            buffer.pop();                       // Remove the oldest sample
+
+            buffer.push(inputArray[i]);        // Get a new sample and add to buffer
+            movingAverageSum += inputArray[i]; // adding the sample to the sum
+
+            if (buffer.size() > windowSize)
+            {
+                movingAverageSum -= buffer.front(); // Subtract the oldest sample and protects future avg.
+                buffer.pop();                       // Remove the oldest sample
+            }
+
+            float filteredValue = movingAverageSum / buffer.size(); // calculating the average
+            filteredDataList.push_back(filteredValue);
         }
 
-        float filteredValue = movingAverageSum / buffer.size(); // calculating the average
-
-        return filteredValue;
+        return filteredDataList;
     }
 
 private:
